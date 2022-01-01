@@ -2,35 +2,26 @@ const OPTIONS = ["rock", "paper", "scissors"];
 const PLAYER_ONE = "user";
 const PLAYER_TWO = "computer";
 const score = { user: 0, computer: 0 };
+let roundNum = 1;
 
-game();
-
-function game() {
-  console.log("Run 5 games");
-  for (let i = 1; i <= 5; i++) {
-    let playerSelection = prompt(
-      `Round ${i}: Enter Selection (rock,paper,scissors): `,
-      "paper"
-    );
-    playerSelection = playerSelection.toLowerCase();
-    while (!OPTIONS.includes(playerSelection)) {
-      playerSelection = prompt(
-        `Round ${i}: Text Error! Enter Selection (rock,paper,scissors): `,
-        "paper"
-      );
-      playerSelection = playerSelection.toLowerCase();
-    }
-
+const resultsEl = document.querySelector('#results');
+const buttons = document.querySelectorAll('button');
+document.querySelectorAll("button").forEach((item) => {
+  item.addEventListener("click", (event) => {
+    console.log(event.target.id);
+    const playerSelection = event.target.id.toLowerCase();
     const computerSelection = computerPlay();
     playRound(playerSelection, computerSelection);
-  }
-  showResults();
-}
+  });
+});
 
 
 function playRound(playerSelection, computerSelection) {
-  console.log({ playerSelection });
-  console.log({ computerSelection });
+  const roundEl = document.createElement("div");
+  roundEl.className = "round";
+  roundEl.textContent = `Round ${roundNum++} `;
+  roundEl.textContent += `player: ${playerSelection} computer: ${computerSelection}`;
+  resultsEl.appendChild(roundEl);
 
   switch (playerSelection) {
     case computerSelection:
@@ -68,16 +59,23 @@ function computerPlay() {
 function roundWon(winner) {
   score[winner] += 1;
   console.log(`${winner} won round.`);
+  if (score.user + score.computer === 3) {
+    showResults();
+  }
 }
 
 function showResults() {
+  const resultEl = document.createElement("div");
+  resultEl.className = "result";
+ 
   console.log("results are:");
   console.log({ score });
   if (score.user > score.computer) {
-    console.log(`${PLAYER_ONE} won the game.`);
+    resultEl.textContent = `${PLAYER_ONE} won the game.`;
   } else {
-    console.log(`${PLAYER_TWO} won the game.`);
+    resultEl.textContent = `${PLAYER_TWO} won the game.`;
   }
+   resultsEl.appendChild(resultEl);
 }
 
 
