@@ -1,54 +1,52 @@
 const OPTIONS = ["rock", "paper", "scissors"];
 const PLAYER_ONE = "user";
 const PLAYER_TWO = "computer";
-const score = { user: 0, computer: 0 };
+const TIE = "tie";
+const score = { user: 0, computer: 0, tie: 0 };
 let roundNum = 1;
 
-const resultsEl = document.querySelector('#results');
-const buttons = document.querySelectorAll('button');
+const resultsEl = document.querySelector("#results");
+const buttons = document.querySelectorAll("button");
+const scoreEl = document.querySelector("#score");
+
 document.querySelectorAll("button").forEach((item) => {
   item.addEventListener("click", (event) => {
-    console.log(event.target.id);
     const playerSelection = event.target.id.toLowerCase();
     const computerSelection = computerPlay();
     playRound(playerSelection, computerSelection);
   });
 });
 
-
 function playRound(playerSelection, computerSelection) {
-  const roundEl = document.createElement("div");
-  roundEl.className = "round";
-  roundEl.textContent = `Round ${roundNum++} `;
-  roundEl.textContent += `player: ${playerSelection} computer: ${computerSelection}`;
-  resultsEl.appendChild(roundEl);
-
+  let winner;
   switch (playerSelection) {
     case computerSelection:
-      console.log("tie");
+      winner = TIE;
       break;
     case "rock":
       if (computerSelection === "paper") {
-        roundWon(PLAYER_TWO);
+        winner = PLAYER_TWO;
       } else {
-        roundWon(PLAYER_ONE);
+        winner = PLAYER_ONE;
       }
       break;
     case "paper":
       if (computerSelection === "scissors") {
-        roundWon(PLAYER_TWO);
+        winner = PLAYER_TWO;
       } else {
-        roundWon(PLAYER_ONE);
+        winner = PLAYER_ONE;
       }
       break;
     case "scissors":
       if (computerSelection === "rock") {
-        roundWon(PLAYER_TWO);
+        winner = PLAYER_TWO;
       } else {
-        roundWon(PLAYER_ONE);
+        winner = PLAYER_ONE;
       }
       break;
   }
+
+  roundOver(winner, computerSelection, playerSelection);
 }
 
 function computerPlay() {
@@ -56,27 +54,51 @@ function computerPlay() {
   return OPTIONS[randomIndex];
 }
 
-function roundWon(winner) {
+function roundOver(winner, computerSelection, playerSelection) {
   score[winner] += 1;
-  console.log(`${winner} won round.`);
+
+  const roundResultsEl = document.createElement("div");
+  roundResultsEl.className = "round-results";
+  roundResultsEl.innerHTML = `
+
+<h3>Round ${roundNum++}</h3>
+  <div>${PLAYER_ONE}: ${playerSelection} </div>
+  <div>${PLAYER_TWO}: ${computerSelection} </div>
+  <div>winner: ${winner} </div>
+
+  `;
+  resultsEl.appendChild(roundResultsEl);
+
+  scoreEl.innerHTML = `
+   <h3>Score</h3>
+  <ul>
+          <li>user: <span id="player-one-score">${score.user}</span></li>
+          <li>computer: <span id="player-two-score">${score.computer}</span></li>
+          <li>tie: <span id="tie">${score.tie}</span></li>
+        </ul>
+  `;
+
   if (score.user + score.computer === 3) {
-    showResults();
+    gameResult();
   }
 }
 
-function showResults() {
-  const resultEl = document.createElement("div");
-  resultEl.className = "result";
- 
-  console.log("results are:");
-  console.log({ score });
+function gameResult() {
+  const gameResultsEl = document.createElement("h3");
+  let winner;
+  gameResultsEl.className = "game-results";
+
   if (score.user > score.computer) {
-    resultEl.textContent = `${PLAYER_ONE} won the game.`;
+    winner = PLAYER_ONE;
   } else {
-    resultEl.textContent = `${PLAYER_TWO} won the game.`;
+     winner = PLAYER_TWO;
   }
-   resultsEl.appendChild(resultEl);
+  gameResultsEl.textContent = `${winner} won the game. Refresh to play again.`;
+  resultsEl.appendChild(gameResultsEl);
+
+  document.querySelectorAll("button").forEach((item) => {
+    item.disabled = true;
+  });
+
+
 }
-
-
-
